@@ -1,2 +1,2 @@
 # Tooltip Sequence v2
-> Coming soon
+> Built with Vite App

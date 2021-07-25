@@ -1,4 +1,8 @@
-import { calculateArrowPosition, calculatePositions, getElement } from './libs/helper';
+import {
+  calculateArrowPosition,
+  calculatePositions,
+  getElement,
+} from './libs/helper';
 import './style.css'
 
 interface References {
@@ -19,7 +23,6 @@ interface References {
   quit_text: string,
   end_text: string,
 }
-
 interface Sequence {
   element: string,
   description: string | HTMLElement,
@@ -64,7 +67,7 @@ class TooltipSequence {
     sequence: [],
     onComplete: function() { console.log('Ended') }
   };
-  constructor(data: any) {
+  constructor(data: TooltipData) {
     this.#data = { ...this.#data, ...data };
   }
   handleEvent(e: any): void {
@@ -237,9 +240,13 @@ class TooltipSequence {
 const sequence = new TooltipSequence({ 
   sequence: [{
     element: "#element",
-    description: "This is an element.",
+    description: "This is a description",
     placement: "bottom"
-  }] 
+  }, {
+    element: "#element2",
+    description: "This is another description",
+    placement: "bottom"
+  }]
 });
 sequence.createSequence();
 // export default (options: any) => new TooltipSequence(options);

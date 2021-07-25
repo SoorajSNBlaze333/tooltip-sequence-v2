@@ -1,7 +1,5 @@
 const offset: number = 15;
 const getElement = (selector: string): HTMLElement | null => document.querySelector(selector) || null;
-const getElements = (selector: string): NodeList | null => document.querySelectorAll(selector) || null;
-
 const calculatePositions = (element: HTMLElement, description: HTMLElement, placement: string): any => {
   const elemBoundaries = element.getBoundingClientRect();
   const descBoundaries = description.getBoundingClientRect();
@@ -37,7 +35,6 @@ const calculatePositions = (element: HTMLElement, description: HTMLElement, plac
   }
   return position;
 };
-
 const calculateArrowPosition = (element: HTMLElement, placement: string, descPosition: any, active: HTMLElement, description: HTMLElement) => {
   const position = { x: 0, y: 0 };
   const activeBoundaries = active.getBoundingClientRect();
@@ -84,7 +81,6 @@ const calculateArrowPosition = (element: HTMLElement, placement: string, descPos
 
 export {
   getElement,
-  getElements,
   calculatePositions,
   calculateArrowPosition,
 };

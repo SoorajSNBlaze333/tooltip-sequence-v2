@@ -246,6 +246,10 @@ const sequence = new TooltipSequence({
     element: "#element2",
     description: "This is another description",
     placement: "bottom"
+  }, {
+    element: "#element3",
+    description: "This is yet another description",
+    placement: "bottom"
   }]
 });
 sequence.createSequence();

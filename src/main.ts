@@ -1,8 +1,41 @@
 import { calculateArrowPosition, calculatePositions, getElement } from './libs/helper';
 import './style.css'
 
+interface References {
+  target: string,
+  next: string,
+  prev: string,
+  end: string,
+  backdrop: string,
+  arrow: string,
+  active: string,
+  active_description: string,
+  active_description_text: string,
+  footer: string,
+  disabled_button: string,
+  stop_scroll: string,
+  next_text: string,
+  prev_text: string,
+  quit_text: string,
+  end_text: string,
+}
+
+interface Sequence {
+  element: string,
+  description: string | HTMLElement,
+  placement: string,
+}
+interface TooltipData {
+  welcomeText?: string,
+  confirmText?: string,
+  cancelText?: string,
+  backdropColor?: string,
+  sequence: Sequence[],
+  onComplete?: () => void | undefined,
+}
+
 class TooltipSequence {
-  #references = {
+  #references: References = {
     // classes
     target: "body",
     next: "tooltip-helper-next-sequence",
@@ -22,8 +55,8 @@ class TooltipSequence {
     quit_text: "Quit",
     end_text: "Finish",
   };
-  #index = 0;
-  #data = {
+  #index: number = 0;
+  #data: TooltipData = {
     welcomeText: "Do you want to take the tour of the page?",
     confirmText: "Yes",
     cancelText: "No", 
@@ -77,7 +110,7 @@ class TooltipSequence {
     }
     return addStyles(activeElement);
   }
-  createDescription(backdrop: HTMLElement, description: string): HTMLElement | undefined {
+  createDescription(backdrop: HTMLElement, description: string | HTMLElement): HTMLElement | undefined {
     const { sequence } = this.#data;
     let descriptionElement = getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);
     if (!descriptionElement) {
@@ -112,7 +145,8 @@ class TooltipSequence {
     };
     const descTextElem = getElement(`#${this.#references.active_description_text}`);
     if (!descTextElem) return;
-    descTextElem.innerHTML = description;
+    if (typeof description === "string") descTextElem.innerHTML = description;
+    else descTextElem.appendChild(description);
     return descriptionElement;
   }
   createArrow(backdrop: HTMLElement): HTMLElement {
@@ -185,7 +219,7 @@ class TooltipSequence {
     if (!body) return;
     body.classList.remove(this.#references.stop_scroll);
     this.listeners(true);
-    return this.#data.onComplete()
+    if (this.#data.onComplete) return this.#data.onComplete();   
   }
   createSequence(): void {
     try {

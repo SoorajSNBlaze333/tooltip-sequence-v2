@@ -202,11 +202,10 @@ class TooltipSequence {
 
 const sequence = new TooltipSequence({ 
   sequence: [{
-    element:"#element",
-    description:"This is an element.",
-    placement:"bottom"
+    element: "#element",
+    description: "This is an element.",
+    placement: "bottom"
   }] 
 });
 sequence.createSequence();
-
 // export default (options: any) => new TooltipSequence(options);

@@ -1,8 +1,10 @@
-import { getElement } from './libs/helper';
+import { calculateArrowPosition, calculatePositions, getElement } from './libs/helper';
 import './style.css'
 
 class TooltipSequence {
   #references = {
+    // classes
+    target: "body",
     next: "tooltip-helper-next-sequence",
     prev: "tooltip-helper-prev-sequence",
     end: "tooltip-helper-end-sequence",
@@ -11,9 +13,13 @@ class TooltipSequence {
     active: "tooltip-helper-active",
     active_description: "tooltip-helper-active-description",
     active_description_text: "tooltip-helper-active-description-text",
+    footer: "tooltip-helper-footer",
     disabled_button: "tooltip-disabled-btn",
+    stop_scroll: "stop-scroll",
+    // text
     next_text: "Next",
     prev_text: "Previous",
+    quit_text: "Quit",
     end_text: "Finish",
   };
   #index = 0;
@@ -50,7 +56,7 @@ class TooltipSequence {
       backdrop.addEventListener("click", this.handleEvent.bind(this));
     }
   }
-  createActiveElement(backdrop: HTMLElement, elemBoundaries: any, styles: any): HTMLElement {
+  createActive(backdrop: HTMLElement, elemBoundaries: any, styles: any): HTMLElement {
     function addStyles(element: HTMLElement): HTMLElement {
       element.style.top = Math.round(elemBoundaries.top) + "px";
       element.style.left = Math.round(elemBoundaries.left) + "px";
@@ -71,15 +77,21 @@ class TooltipSequence {
     }
     return addStyles(activeElement);
   }
-  createDescriptionElement(backdrop: HTMLElement, description: string): HTMLElement | undefined {
+  createDescription(backdrop: HTMLElement, description: string): HTMLElement | undefined {
     const { sequence } = this.#data;
     let descriptionElement = getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);
     if (!descriptionElement) {
       descriptionElement = document.createElement("div");
       descriptionElement.style.willChange = "transform";
-      descriptionElement.classList.add("tooltip-helper-active-description");
-      descriptionElement.innerHTML += "<p id='tooltip-helper-active-description-text'></p>";
-      descriptionElement.innerHTML += ""; // footerHTML
+      descriptionElement.classList.add(this.#references.active_description);
+      descriptionElement.innerHTML += `<p id=${this.#references.active_description_text}></p>`;
+      descriptionElement.innerHTML += `<div class=${this.#references.footer}>
+        <button id=${this.#references.end} class=${this.#references.end}>${this.#references.quit_text}</button>
+        <div>
+          <button id=${this.#references.prev} class=${this.#references.prev}>${this.#references.prev_text}</button>
+          <button id=${this.#references.next} class=${this.#references.next}>${this.#references.next_text}</button>
+        </div>
+      </div>`;
       backdrop.append(descriptionElement);
     }
     const prevBtn = getElement(`#${this.#references.prev}`);
@@ -103,7 +115,7 @@ class TooltipSequence {
     descTextElem.innerHTML = description;
     return descriptionElement;
   }
-  createArrowElement(backdrop: HTMLElement): HTMLElement {
+  createArrow(backdrop: HTMLElement): HTMLElement {
     const arrowElement = getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
     if (!arrowElement) {
       const arrowElement = document.createElement("div");
@@ -120,43 +132,44 @@ class TooltipSequence {
     return backdrop;
   }
   stage(): void {
-    // const { sequence } = this.#data;
-    // const { element, placement } = sequence[this.#index];
-    // const backdrop = getElement(`#${this.#references.backdrop}`);
-    // if (!backdrop) return;
-    // const position: any = { x: 0, y: 0 };
-    // const arrowPosition: any = { x: 0, y: 0 };
-    // let block: ScrollLogicalPosition = 'center';
-    // let newPlacement: string = placement;
-    // if (window.innerWidth <= 400 && (placement === 'left' || placement === 'right')) newPlacement = 'bottom'; 
+    const { sequence } = this.#data;
+    const { element, description, placement } = sequence[this.#index];
+    const backdrop = getElement(`#${this.#references.backdrop}`);
+    if (!backdrop) return;
+    let position: any = { x: 0, y: 0 };
+    let arrowPosition: any = { x: 0, y: 0 };
+    let block: ScrollLogicalPosition = 'center';
+    let newPlacement: string = placement;
+    if (window.innerWidth <= 400 && (placement === 'left' || placement === 'right')) newPlacement = 'bottom'; 
 
-    // const elem = getElement(element);
-    // if (!elem) return this.end();
-    // const body = getElement("body");
-    // if (!body) return;
-    // body.classList.add('stop-scroll');
-    // elem.scrollIntoView({ behavior: 'smooth', block });
+    const elem = getElement(element);
+    if (!elem) return this.end();
+    const body = getElement(this.#references.target);
+    if (!body) return;
+    body.classList.add(this.#references.stop_scroll);
+    elem.scrollIntoView({ behavior: 'smooth', block });
 
-    // let styles = getComputedStyle(elem);
-    // let elemBoundaries = elem.getBoundingClientRect();
-    // let activeElement = createActiveElement(backdrop, elemBoundaries, styles);
-    // let descriptionElement = createDescriptionElement(backdrop, description);
-    // let arrowElement = createArrowElement(backdrop);
+    let styles = getComputedStyle(elem);
+    let elemBoundaries = elem.getBoundingClientRect();
+    let activeElement = this.createActive(backdrop, elemBoundaries, styles);
+    let descriptionElement = this.createDescription(backdrop, description);
+    let arrowElement = this.createArrow(backdrop);
   
-    // position = calculatePositions(elem, descriptionElement, placement);
+    if (!descriptionElement) return;
+    position = calculatePositions(elem, descriptionElement, newPlacement);
     
-    // let desc = descriptionElement.getBoundingClientRect();
-    // if (position.x + desc.width >= window.innerWidth) {
-    //   position.x = Math.round(elemBoundaries.right - desc.width + 15);
-    // } else if (position.x <= 0) {
-    //   position.x = Math.round(elemBoundaries.x - 15);
-    //   if (desc.width >= window.innerWidth) {
-    //     descriptionElement.style.width = (window.innerWidth - (position.x * 2)) + "px";
-    //   }
-    // }
-    // descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
-    // arrowPosition = calculateArrowPosition(arrowElement, placement, position, activeElement, descriptionElement);
-    // arrowElement.style.transform = "translate3d(" + arrowPosition.x + "px, " + arrowPosition.y + "px, 0px)";
+    let desc = descriptionElement.getBoundingClientRect();
+    if (position.x + desc.width >= window.innerWidth) {
+      position.x = Math.round(elemBoundaries.right - desc.width + 15);
+    } else if (position.x <= 0) {
+      position.x = Math.round(elemBoundaries.x - 15);
+      if (desc.width >= window.innerWidth) {
+        descriptionElement.style.width = (window.innerWidth - (position.x * 2)) + "px";
+      }
+    }
+    descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
+    arrowPosition = calculateArrowPosition(arrowElement, newPlacement, position, activeElement, descriptionElement);
+    arrowElement.style.transform = "translate3d(" + arrowPosition.x + "px, " + arrowPosition.y + "px, 0px)";
     // if (sequence.hasOwnProperty('events') && sequence.events.hasOwnProperty('on')) { sequence.events.on(sequence) };
   }
   next(): void {
@@ -168,16 +181,15 @@ class TooltipSequence {
     return this.stage();
   }
   end(): void {
-    const body = getElement('body');
+    const body = getElement(this.#references.target);
     if (!body) return;
-    body.classList.remove('stop-scroll');
+    body.classList.remove(this.#references.stop_scroll);
     this.listeners(true);
-    // index = 0;
     return this.#data.onComplete()
   }
   createSequence(): void {
     try {
-      const body = getElement("body")
+      const body = getElement(this.#references.target)
       if (!body) return;
       body.appendChild(this.createBackdrop())
       this.listeners();

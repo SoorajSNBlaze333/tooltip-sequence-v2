@@ -14,16 +14,19 @@
 
 .tooltip-helper-active-description {
   background-color: rgb(36, 36, 36);
-  position: absolute;
-  font-size: 15px;
+  position: relative;
+  font-size: 1rem;
   border-radius: 5px;
   height: auto;
+  width: auto;
+  min-width: 300px;
   max-width: 500px;
   z-index: 9998;
   transition-property: transform;
   will-change: transform;
   transform: translateX(0px) translateY(0px);
-  transition-duration: 150ms;
+  transform-origin: 5px 5px;
+  /* transition-duration: 500ms; */
   transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
@@ -48,11 +51,11 @@
 }
 
 .tooltip-helper-footer {
-  height: 25%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
+  margin-bottom: -15px;
 }
 
 .tooltip-helper-footer > div {
@@ -62,8 +65,8 @@
 }
 
 .tooltip-helper-active {
-  position: absolute;
-  transition-duration: 150ms;
+  position: relative;
+  /* transition-duration: 500ms; */
   transition-property: transform;
   will-change: transform;
   transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
@@ -80,14 +83,16 @@
 .tooltip-helper-quit-sequence {
   background-color: rgb(22, 121, 251);
   border: none;
-  border-radius: 2px;
+  border-radius: 5px;
   outline: none;
-  padding: 3px 10px;
+  padding: 10px;
   color: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 25px;
+  max-height: 30px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .tooltip-helper-quit-sequence {
@@ -98,40 +103,38 @@
   background-color: rgb(92, 92, 92) !important;
   user-select: none !important;
   color: rgba(255, 255, 255, 0.671);
+  cursor: not-allowed;
+}
+
+.tooltip-helper-arrow-hidden {
+  visibility: hidden;
 }
 
 .tooltip-helper-arrow {
-  position: absolute;
-  width: 0; 
-  height: 0; 
-  z-index: 9997;  
+  position: relative;
+  width: 15px; 
+  height: 15px; 
+  z-index: 9997; 
   transition-property: transform;
   will-change: transform;
   transform: translate3d(0px, 0px, 0px);
-  transition-duration: 150ms;
+  /* transition-duration: 300ms; */
   transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  background-color: rgb(36, 36, 36);
 }
 
 .tooltip-helper-arrow-up {
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-bottom: 20px solid rgb(36, 36, 36);
+  border-bottom: 10px solid rgb(36, 36, 36);
 }
 
 .tooltip-helper-arrow-down {
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-top: 20px solid rgb(36, 36, 36);
+  border-top: 10px solid rgb(36, 36, 36);
 }
 
 .tooltip-helper-arrow-left {
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-right: 20px solid rgb(36, 36, 36);
+  border-right: 10px solid rgb(36, 36, 36);
 }
 
 .tooltip-helper-arrow-right {
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 20px solid rgb(36, 36, 36);
+  border-left: 10px solid rgb(36, 36, 36);
 }

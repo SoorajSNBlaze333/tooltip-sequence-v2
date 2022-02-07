@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test App</title>
+    <link rel="stylesheet" href="./dist/tooltip-sequence-v2.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="element">Element</div>
+      <button onclick="return handleClick()">Test</button>
+      <div id="element2">Element 2</div>
+      <div id="element3">Element 3</div>
+    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./dist/tooltip-sequence-v2.js"></script>
+    <script>
+      const TooltipSequence = TooltipSequenceV2.default.TooltipSequence;
+
+      const sequence = new TooltipSequence({ 
+        sequence: [{
+          element: "#element",
+          description: "This is a description",
+          placement: "bottom"
+        }, {
+          element: "#element2",
+          description: "This is another description",
+          placement: "bottom"
+        }, {
+          element: "#element3",
+          description: "This is yet another description",
+          placement: "bottom"
+        }]
+      });
+      
+      function handleClick() {
+        sequence.createSequence();
+      }
+    </script>
+  </body>
+</html>

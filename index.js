@@ -131,7 +131,6 @@ class TooltipSequence {
   };
   #handleResize() {
     try {
-      console.log('Resizing!');
       this.#stage();
     } catch (err) {
       throw new Error('Oops something went wrong while resizing!');
@@ -148,7 +147,6 @@ class TooltipSequence {
     //   desc.classList.remove(this.#references.active_description_animate);
     // }
 
-    console.log(keyPressed); // debug
     if (keyPressed === 39 && this.#index < this.#data.sequence.length - 1) {
       // removeAnimation();
       return this.#next();
@@ -307,6 +305,9 @@ class TooltipSequence {
     descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
     arrowPosition = this.#calculateArrowPosition(arrowElement, newPlacement, position, activeElement, descriptionElement);
     arrowElement.style.transform = "translate3d(" + arrowPosition.x + "px, " + arrowPosition.y + "px, 0px)";
+    if (window.innerWidth < 480 && window.innerWidth > 20) { 
+      descriptionElement.style.width = window.innerWidth - 20 + "px";
+    }
   };
   #next() {
     this.#index += 1;

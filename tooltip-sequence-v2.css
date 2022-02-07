@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .stop-scroll {
   overflow: hidden;
   -webkit-overflow-scrolling: hidden;

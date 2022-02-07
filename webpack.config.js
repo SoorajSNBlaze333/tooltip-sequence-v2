@@ -2,7 +2,7 @@ const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './index.js',
   module: {
     rules: [
       {
@@ -10,7 +10,7 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       }
-    ]
+    ],
   },
   resolve: {
     extensions: ['.ts', '.js'],

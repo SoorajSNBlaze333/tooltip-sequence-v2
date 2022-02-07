@@ -243,9 +243,9 @@ class TooltipSequence {
     
     let desc = descriptionElement.getBoundingClientRect();
     if (position.x + desc.width >= window.innerWidth) {
-      position.x = Math.round(elemBoundaries.right - desc.width + 15);
+      position.x = Math.round(elemBoundaries.right - desc.width + this.#elementOffsetMin);
     } else if (position.x <= 0) {
-      position.x = Math.round(elemBoundaries.x - 15);
+      position.x = Math.round(elemBoundaries.x - this.#elementOffsetMin);
       if (desc.width >= window.innerWidth) {
         descriptionElement.style.width = (window.innerWidth - (position.x * 2)) + "px";
       }
@@ -253,7 +253,6 @@ class TooltipSequence {
     descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
     arrowPosition = this.#calculateArrowPosition(arrowElement, newPlacement, position, activeElement, descriptionElement);
     arrowElement.style.transform = "translate3d(" + arrowPosition.x + "px, " + arrowPosition.y + "px, 0px)";
-    // if (sequence.hasOwnProperty('events') && sequence.events.hasOwnProperty('on')) { sequence.events.on(sequence) };
   };
   next() {
     this.#index += 1;

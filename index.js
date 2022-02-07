@@ -196,17 +196,32 @@ class TooltipSequence {
     else descTextElem.appendChild(description);
     return descriptionElement;
   };
-  #createArrow(description) {
-    const arrowElement = this.#getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
+  #renderArrow(description) {
+    let arrowElement = this.#getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
     if (!arrowElement) {
-      const arrowElement = document.createElement("div");
+      arrowElement = document.createElement("div");
       arrowElement.setAttribute("id", this.#references.arrow);
       description.append(arrowElement);
       arrowElement.classList.add(this.#references.arrow_hidden);
-      return arrowElement;
     }
-    return arrowElement;
-  };
+    arrowElement.removeAttribute('class');
+    arrowElement.classList.add(this.#references.arrow);
+    const transform = { x: 0, y: 0, rotation: 45 };
+    if (newPlacement === 'top') {
+      transform.x = transform.x + (desc.width / 2) - 7.5;
+      transform.y = transform.y + 7.5;
+    } else if (newPlacement === 'right') {
+      transform.x = transform.x - 7.5;
+      transform.y = transform.y - (desc.height / 2) + 5;
+    } else if (newPlacement === 'bottom') {
+      transform.x = transform.x + (desc.width / 2) - 5;
+      transform.y = transform.y - (desc.height) + 7.5;
+    } else {
+      transform.x = transform.x + desc.width - 7.5;
+      transform.y = transform.y - (desc.height / 2) + 5;
+    }
+    arrowElement.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0px) rotateZ(${transform.rotation}deg)`
+  }
   #createBackdrop() {
     const backdrop = document.createElement("div");
     backdrop.id = this.#references.backdrop;
@@ -231,12 +246,9 @@ class TooltipSequence {
     body.classList.add(this.#references.stop_scroll);
     elem.scrollIntoView({ behavior: 'smooth', block });
 
-    let styles = getComputedStyle(elem);
     let elemBoundaries = elem.getBoundingClientRect();
-    let activeElement = this.#createActive(backdrop, elemBoundaries, styles);
     let descriptionElement = this.#createDescription(backdrop, description);
     
-  
     if (!descriptionElement) return;
     position = this.#calculatePositions(elem, descriptionElement, newPlacement);
     
@@ -251,33 +263,8 @@ class TooltipSequence {
     }
     descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
     
-    let arrowElement = this.#getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
-    if (!arrowElement) {
-      arrowElement = document.createElement("div");
-      arrowElement.setAttribute("id", this.#references.arrow);
-      descriptionElement.append(arrowElement);
-      arrowElement.classList.add(this.#references.arrow_hidden);
-    }
-    arrowElement.removeAttribute('class');
-    arrowElement.classList.add(this.#references.arrow);
+    this.#renderArrow();
 
-
-    const transform = { x: 0, y: 0, rotation: 45 };
-    if (newPlacement === 'top') {
-      transform.x = transform.x + (desc.width / 2) - 7.5;
-      transform.y = transform.y + 7.5;
-    } else if (newPlacement === 'right') {
-      transform.x = transform.x - 7.5;
-      transform.y = transform.y - (desc.height / 2) + 5;
-    } else if (newPlacement === 'bottom') {
-      transform.x = transform.x + (desc.width / 2) - 5;
-      transform.y = transform.y - (desc.height) + 7.5;
-    } else {
-      transform.x = transform.x + desc.width - 7.5;
-      transform.y = transform.y - (desc.height / 2) + 5;
-    }
-    arrowElement.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0px) rotateZ(${transform.rotation}deg)`
-    
     if (window.innerWidth < 480 && window.innerWidth > 20) { 
       descriptionElement.style.width = window.innerWidth - 20 + "px";
     }

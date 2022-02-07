@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-build": "webpack --config webpack.config.js --mode=development",
     "build": "webpack --config webpack.config.js --mode=production",
-    "serve": "http-server -a localhost -p 8000 -c-1"
+    "serve": "http-server -a localhost -p 3000 -c-1"
   },
   "author": "",
   "license": "ISC",

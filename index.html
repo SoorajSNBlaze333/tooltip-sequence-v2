@@ -31,8 +31,11 @@
         }, {
           element: "#element3",
           description: "This is yet another description",
-          placement: "bottom"
-        }]
+          placement: "right"
+        }],
+        onComplete: function() {
+          console.log('Came');
+        }
       });
       
       function handleClick() {

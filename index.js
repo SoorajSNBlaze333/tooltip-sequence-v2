@@ -42,6 +42,7 @@ class TooltipSequence {
     this.#data = { ...this.#data, ...data };
   };
   #getElement(selector) { return document.querySelector(selector) || null };
+  #getElementById(id) { return this.#getElement('#' + id) };
   #calculateArrowPosition(element, placement, descPosition, active, description) {
     const position = this.#startPosition;
     const activeBoundaries = active.getBoundingClientRect();
@@ -116,29 +117,30 @@ class TooltipSequence {
     }
     return position;
   };
-  handleEvent(e) {
+  #handleEvent(e) {
     if (!e.target || !e.target.id) return;
     const targetId = e.target.id;
+    console.log(targetId);
     switch(targetId) {
-      case this.#references.next: return this.next();
-      case this.#references.prev: return this.prev();
-      case this.#references.end: return this.end();
-      case this.#references.active: return this.end();
-      case this.#references.backdrop: return this.end();
-      default: return;
+      case this.#references.next: return this.#next();
+      case this.#references.prev: return this.#prev();
+      case this.#references.end: return this.#end();
+      case this.#references.active: return this.#end();
+      case this.#references.backdrop: return this.#end();
+      default: return this.#end();
     }
   };
-  listeners(off = false) {
-    const backdrop = this.#getElement(`#${this.#references.backdrop}`);
+  #listeners(off = false) {
+    const backdrop = this.#getElementById(this.#references.backdrop);
     if (!backdrop) return;
     if (off) {
-      backdrop.removeEventListener("click", this.handleEvent.bind(this));
+      backdrop.removeEventListener("click", this.#handleEvent.bind(this));
       if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
     } else {
-      backdrop.addEventListener("click", this.handleEvent.bind(this));
+      backdrop.addEventListener("click", this.#handleEvent.bind(this));
     }
   };
-  createActive(backdrop, elemBoundaries, styles) {
+  #createActive(backdrop, elemBoundaries, styles) {
     function addStyles(element) {
       element.style.top = Math.round(elemBoundaries.top) + "px";
       element.style.left = Math.round(elemBoundaries.left) + "px";
@@ -159,7 +161,7 @@ class TooltipSequence {
     }
     return addStyles(activeElement);
   };
-  createDescription(backdrop, description) {
+  #createDescription(backdrop, description) {
     const { sequence } = this.#data;
     let descriptionElement = this.#getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);
     if (!descriptionElement) {
@@ -188,8 +190,10 @@ class TooltipSequence {
       }
     };
     if (nextBtn) {
+      console.log(this.#index);
       if (sequence.length === 1 || this.#index === sequence.length - 1) {
         nextBtn.innerText = this.#references.end_text;
+        nextBtn.setAttribute('id', this.#references.end);
       } else nextBtn.innerText = this.#references.next_text;
     };
     const descTextElem = this.#getElement(`#${this.#references.active_description_text}`);
@@ -198,7 +202,7 @@ class TooltipSequence {
     else descTextElem.appendChild(description);
     return descriptionElement;
   };
-  createArrow(backdrop) {
+  #createArrow(backdrop) {
     const arrowElement = this.#getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
     if (!arrowElement) {
       const arrowElement = document.createElement("div");
@@ -214,15 +218,16 @@ class TooltipSequence {
     backdrop.classList.add(this.#references.backdrop);
     return backdrop;
   };
-  stage() {
+  #stage() {
     const { sequence } = this.#data;
     const { element, description, placement } = sequence[this.#index];
-    const backdrop = this.#getElement(`#${this.#references.backdrop}`);
+    const backdrop = this.#getElementById(this.#references.backdrop);
     if (!backdrop) return;
-    let position = { x: 0, y: 0 };
-    let arrowPosition = { x: 0, y: 0 };
+    let position = this.#startPosition;
+    let arrowPosition = this.#startPosition;
     let block = 'center';
     let newPlacement = placement;
+    // for mobile devices
     if (window.innerWidth <= 400 && (placement === 'left' || placement === 'right')) newPlacement = 'bottom'; 
 
     const elem = this.#getElement(element);
@@ -234,9 +239,9 @@ class TooltipSequence {
 
     let styles = getComputedStyle(elem);
     let elemBoundaries = elem.getBoundingClientRect();
-    let activeElement = this.createActive(backdrop, elemBoundaries, styles);
-    let descriptionElement = this.createDescription(backdrop, description);
-    let arrowElement = this.createArrow(backdrop);
+    let activeElement = this.#createActive(backdrop, elemBoundaries, styles);
+    let descriptionElement = this.#createDescription(backdrop, description);
+    let arrowElement = this.#createArrow(backdrop);
   
     if (!descriptionElement) return;
     position = this.#calculatePositions(elem, descriptionElement, newPlacement);
@@ -254,38 +259,44 @@ class TooltipSequence {
     arrowPosition = this.#calculateArrowPosition(arrowElement, newPlacement, position, activeElement, descriptionElement);
     arrowElement.style.transform = "translate3d(" + arrowPosition.x + "px, " + arrowPosition.y + "px, 0px)";
   };
-  next() {
+  #next() {
     this.#index += 1;
-    return this.stage();
+    return this.#stage();
   };
-  prev() {
+  #prev() {
     this.#index -= 1;
-    return this.stage();
+    return this.#stage();
   };
-  end() {
+  #end() {
     const body = this.#getElement(this.#references.target);
     if (!body) return;
     body.classList.remove(this.#references.stop_scroll);
-    this.listeners(true);
+    this.#listeners(true);
+    this.#index = 0;
     if (this.#data.onComplete) return this.#data.onComplete();   
   };
-  handleResize(e) {
-    this.stage();
+  #handleResize(e) {
+    try {
+      this.#stage();
+    } catch (err) {
+      throw new Error('Oops something went wrong while resizing!');
+    }
   }
   createSequence() {
     try {
       const body = this.#getElement(this.#references.target)
       if (!body) return;
       body.appendChild(this.#createBackdrop())
-      this.listeners();
-      this.stage();
+      this.#listeners();
+      this.#stage();
       // Handle window resize
       if (TooltipSequence.resizeEvent < 1) {
+        console.log('Attached resize handlers!'); // debug
         TooltipSequence.resizeEvent = 1;
-        TooltipSequence.resizeHandler = window.addEventListener('resize', this.handleResize.bind(this));
+        TooltipSequence.resizeHandler = window.addEventListener('resize', this.#handleResize.bind(this));
       }
     } catch (err) {
-      console.log(err);
+      throw new Error('Oops, something went wrong while creating the sequence');
     }
   };
 }
@@ -293,7 +304,3 @@ class TooltipSequence {
 export default {
   TooltipSequence
 }
-
-
-
-

@@ -29,7 +29,7 @@ class TooltipSequence {
     end_text: "Finish",
   };
   #data = {
-    backdropColor: "#1b1b1b8e",
+    backdropColor: "#1414147e",
     sequence: [],
     onComplete: function() {}
   };

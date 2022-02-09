@@ -44,40 +44,6 @@ class TooltipSequence {
   #getElement(selector) { return document.querySelector(selector) || null };
   #getElementById(id) { return this.#getElement('#' + id) };
   #getBoundingClientRect(element) { return element.getBoundingClientRect() };
-  #calculatePositions(element, descBoundaries, placement) {
-    const elemBoundaries = element.getBoundingClientRect();
-    const position = this.#startPosition;
-    const factor = descBoundaries.width > elemBoundaries.width ? -1 : 1;
-    const verticalX = Math.round(elemBoundaries.x + (factor * Math.abs(elemBoundaries.width - descBoundaries.width) / 2));
-    switch(placement) {
-      case 'top': {
-        position.x = verticalX;
-        position.y = Math.round(elemBoundaries.y - descBoundaries.height - this.#elementOffset);
-        break;
-      }
-      case 'right': {
-        position.x = Math.round(elemBoundaries.x + elemBoundaries.width + this.#elementOffset);
-        position.y = Math.round(elemBoundaries.y + elemBoundaries.height / 2 - descBoundaries.height / 2);
-        break;
-      }
-      case 'bottom': {
-        position.x = verticalX;
-        position.y = Math.round(elemBoundaries.y + elemBoundaries.height + this.#elementOffset);
-        break;
-      }
-      case 'left': {
-        position.x = Math.round(elemBoundaries.x - descBoundaries.width - this.#elementOffset);
-        position.y = Math.round(elemBoundaries.y + elemBoundaries.height / 2 - descBoundaries.height / 2);
-        break;
-      }
-      default: {
-        position.x = verticalX;
-        position.y = Math.round(elemBoundaries.y - descBoundaries.height - this.#elementOffset);
-        break;
-      }
-    }
-    return position;
-  };
   #handleEvent(e) {
     if (!e.target || !e.target.id) return;
     const targetId = e.target.id;
@@ -176,7 +142,7 @@ class TooltipSequence {
     }
     return { prevBtn, nextBtn, finishBtn };
   }
-  async #createDescription(elem, backdrop, description, active, placement) {
+  #createDescription(elem, backdrop, description, active, placement) {
     let descriptionElement = this.#getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);
     if (!descriptionElement) {
       descriptionElement = document.createElement("div");
@@ -311,11 +277,9 @@ class TooltipSequence {
     const styles = getComputedStyle(elem);
     const elemBoundaries = this.#getBoundingClientRect(elem);
     const activeElement = this.#createActive(backdrop, elemBoundaries, styles);
-    this.#createDescription(elem, backdrop, description, activeElement, newPlacement).then(({ descBoundaries, descriptionElement }) => {
-      console.log(descBoundaries, descriptionElement);
-      if (!descriptionElement) return; 
-      this.#renderArrow(descriptionElement, newPlacement, descBoundaries);
-    });
+    const { descBoundaries, descriptionElement } = this.#createDescription(elem, backdrop, description, activeElement, newPlacement);
+    if (!descriptionElement) return; 
+    this.#renderArrow(descriptionElement, newPlacement, descBoundaries);
   };
   #next() {
     this.#index += 1;

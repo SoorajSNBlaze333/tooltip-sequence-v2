@@ -173,8 +173,9 @@ class TooltipSequence {
     activeElement.innerHTML = html;
     return addStyles(activeElement);
   };
-  #createDescription(elem, backdrop, description, active, placement) {
+  #createDescription(elem, backdrop, description, active, plcmt) {
     let descriptionElement = this.#getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);
+    let placement = plcmt;
     if (!descriptionElement) {
       descriptionElement = document.createElement("div");
       descriptionElement.style.willChange = "transform";
@@ -213,12 +214,16 @@ class TooltipSequence {
       descriptionElement.style.width = "100%";
     } else if (placement === 'right' && constraints.right < descBoundaries.width) {
       descriptionElement.style.height = "auto";
-      descriptionElement.style.width = constraints.right - 30 + "px";
+      const newWidth = constraints.right - 20;
+      if (newWidth < 200) placement = 'bottom';
+      else descriptionElement.style.width = newWidth + "px";
     } else if (placement === 'bottom') {
       descriptionElement.style.width = "100%";
-    } else if (placement === 'left' && constraints.left - 60 < descBoundaries.width) {
+    } else if (placement === 'left' && constraints.left - 40 < descBoundaries.width) {
       descriptionElement.style.height = "auto";
-      descriptionElement.style.width = constraints.left - 30 + "px";
+      const newWidth = constraints.right - 20;
+      if (newWidth < 200) placement = 'top';
+      else descriptionElement.style.width = newWidth + "px";
     }
 
     // if (window.innerWidth < 480 && window.innerWidth > 20) { 
@@ -235,10 +240,14 @@ class TooltipSequence {
     position.x = elemBoundaries.x + (elemBoundaries.width / 2) - (width / 2);
     position.y = elemBoundaries.y + (elemBoundaries.height / 2) - (height / 2);
 
-    if (placement === 'top') position.y = position.y - (height / 2) - 20;
-    else if (placement === 'right') position.x = position.x + (width / 2) + 50;
+    if (placement === 'top') {
+      position.y = position.y - (height / 2) - 20;
+      const moveX = (width + position.x) - window.innerWidth;
+      if (moveX > 0) position.x = position.x - moveX;
+    }
+    else if (placement === 'right') position.x = position.x + (width / 2) + 45;
     else if (placement === 'bottom') position.y = position.y + (height / 2) + 20;
-    else if (placement === 'left') position.x = position.x - (width / 2) - 50;
+    else if (placement === 'left') position.x = position.x - (width / 2) - 45;
 
     descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
     return { descBoundaries, descriptionElement }

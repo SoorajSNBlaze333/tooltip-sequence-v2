@@ -151,10 +151,11 @@ class TooltipSequence {
     }
   };
   #createActive(backdrop, elemBoundaries, styles) {
-    function addStyles(element) {
+    function addStyles(element, classes) {
+      classes.split(' ').map(c => element.classList.add(c));
       element.style.height = elemBoundaries.height + "px";
       element.style.width = elemBoundaries.width + "px";
-      element.style.borderRadius = styles.borderRadius;
+      element.style.backgroundColor = "transparent";
       element.style.boxShadow = "0 0 0 9999px " + backdropColor;
       element.style.transform = `translate3d(${elemBoundaries.x}px, ${elemBoundaries.y}px, 0px)`;
       return element;
@@ -162,16 +163,17 @@ class TooltipSequence {
     const { backdropColor } = this.#data;
     const activeElement = this.#getElement(`#${this.#references.backdrop} .${this.#references.active}`);
     const html = this.#getElement(this.#data.sequence[this.#index].element).innerHTML;
+    const targetEl = this.#getElement(this.#data.sequence[this.#index].element);
     if (!activeElement) {
       const activeElement = document.createElement("div");
       activeElement.setAttribute("id", this.#references.active);
       activeElement.classList.add(this.#references.active);
       activeElement.innerHTML = html;
       backdrop.append(activeElement);
-      return addStyles(activeElement);
+      return addStyles(activeElement, targetEl.className);
     }
     activeElement.innerHTML = html;
-    return addStyles(activeElement);
+    return addStyles(activeElement, targetEl.className);
   };
   #createDescription(elem, backdrop, description, active, plcmt) {
     let descriptionElement = this.#getElement(`#${this.#references.backdrop} .${this.#references.active_description}`);

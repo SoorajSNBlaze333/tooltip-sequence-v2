@@ -33,8 +33,8 @@ class TooltipSequence {
     onComplete: function() {}
   };
   #elementOffset = 15;
+  #arrowSize = 15;
   #elementOffsetMin = 10;
-  #elementOffsetMax = 20;
   #startPosition = { x: 0, y: 0 };
   static resizeEventHandler = null;
   static keystrokeEventHandler = null;
@@ -129,12 +129,11 @@ class TooltipSequence {
   };
   #createActive(backdrop, elemBoundaries, styles) {
     function addStyles(element) {
-      element.style.top = Math.round(elemBoundaries.top) + "px";
-      element.style.left = Math.round(elemBoundaries.left) + "px";
       element.style.height = elemBoundaries.height + "px";
       element.style.width = elemBoundaries.width + "px";
       element.style.borderRadius = styles.borderRadius;
       element.style.boxShadow = "0 0 0 9999px " + backdropColor;
+      element.style.transform = `translate3d(${elemBoundaries.x}px, ${elemBoundaries.y}px, 0px)`;
       return element;
     }
     const { backdropColor } = this.#data;
@@ -196,7 +195,7 @@ class TooltipSequence {
     else descTextElem.appendChild(description);
     return descriptionElement;
   };
-  #renderArrow(description) {
+  #renderArrow(description, newPlacement, desc) {
     let arrowElement = this.#getElement(`#${this.#references.backdrop} #${this.#references.arrow}`);
     if (!arrowElement) {
       arrowElement = document.createElement("div");
@@ -208,17 +207,17 @@ class TooltipSequence {
     arrowElement.classList.add(this.#references.arrow);
     const transform = { x: 0, y: 0, rotation: 45 };
     if (newPlacement === 'top') {
-      transform.x = transform.x + (desc.width / 2) - 7.5;
-      transform.y = transform.y + 7.5;
+      transform.x = transform.x + (desc.width / 2) - (this.#arrowSize / 2);
+      transform.y = transform.y + (this.#arrowSize / 2);
     } else if (newPlacement === 'right') {
-      transform.x = transform.x - 7.5;
-      transform.y = transform.y - (desc.height / 2) + 5;
+      transform.x = transform.x - (this.#arrowSize / 2);
+      transform.y = transform.y - (desc.height / 2) + (this.#arrowSize / 2);
     } else if (newPlacement === 'bottom') {
-      transform.x = transform.x + (desc.width / 2) - 5;
-      transform.y = transform.y - (desc.height) + 7.5;
+      transform.x = transform.x + (desc.width / 2) - (this.#arrowSize / 2);
+      transform.y = transform.y - (desc.height) + (this.#arrowSize / 2);
     } else {
-      transform.x = transform.x + desc.width - 7.5;
-      transform.y = transform.y - (desc.height / 2) + 5;
+      transform.x = transform.x + desc.width - (this.#arrowSize / 2);
+      transform.y = transform.y - (desc.height / 2) + (this.#arrowSize / 2);
     }
     arrowElement.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0px) rotateZ(${transform.rotation}deg)`
   }
@@ -246,7 +245,9 @@ class TooltipSequence {
     body.classList.add(this.#references.stop_scroll);
     elem.scrollIntoView({ behavior: 'smooth', block });
 
+    let styles = getComputedStyle(elem);
     let elemBoundaries = elem.getBoundingClientRect();
+    let activeElement = this.#createActive(backdrop, elemBoundaries, styles);
     let descriptionElement = this.#createDescription(backdrop, description);
     
     if (!descriptionElement) return;
@@ -262,9 +263,7 @@ class TooltipSequence {
       }
     }
     descriptionElement.style.transform = "translate3d(" + position.x + "px, " + position.y + "px, 0px)";
-    
-    this.#renderArrow();
-
+    this.#renderArrow(descriptionElement, newPlacement, desc);
     if (window.innerWidth < 480 && window.innerWidth > 20) { 
       descriptionElement.style.width = window.innerWidth - 20 + "px";
     }
@@ -293,6 +292,7 @@ class TooltipSequence {
       this.#listeners();
       this.#stage();
     } catch (err) {
+      console.log(err);
       throw new Error('Oops, something went wrong while creating the sequence');
     }
   };

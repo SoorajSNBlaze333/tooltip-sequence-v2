@@ -44,6 +44,40 @@ class TooltipSequence {
   #getElement(selector) { return document.querySelector(selector) || null };
   #getElementById(id) { return this.#getElement('#' + id) };
   #getBoundingClientRect(element) { return element.getBoundingClientRect() };
+  #calculatePositions(element, descBoundaries, placement) {
+    const elemBoundaries = element.getBoundingClientRect();
+    const position = this.#startPosition;
+    const factor = descBoundaries.width > elemBoundaries.width ? -1 : 1;
+    const verticalX = Math.round(elemBoundaries.x + (factor * Math.abs(elemBoundaries.width - descBoundaries.width) / 2));
+    switch(placement) {
+      case 'top': {
+        position.x = verticalX;
+        position.y = Math.round(elemBoundaries.y - descBoundaries.height - this.#elementOffset);
+        break;
+      }
+      case 'right': {
+        position.x = Math.round(elemBoundaries.x + elemBoundaries.width + this.#elementOffset);
+        position.y = Math.round(elemBoundaries.y + elemBoundaries.height / 2 - descBoundaries.height / 2);
+        break;
+      }
+      case 'bottom': {
+        position.x = verticalX;
+        position.y = Math.round(elemBoundaries.y + elemBoundaries.height + this.#elementOffset);
+        break;
+      }
+      case 'left': {
+        position.x = Math.round(elemBoundaries.x - descBoundaries.width - this.#elementOffset);
+        position.y = Math.round(elemBoundaries.y + elemBoundaries.height / 2 - descBoundaries.height / 2);
+        break;
+      }
+      default: {
+        position.x = verticalX;
+        position.y = Math.round(elemBoundaries.y - descBoundaries.height - this.#elementOffset);
+        break;
+      }
+    }
+    return position;
+  };
   #handleEvent(e) {
     if (!e.target || !e.target.id) return;
     const targetId = e.target.id;
@@ -168,6 +202,7 @@ class TooltipSequence {
     const descBoundaries = this.#getBoundingClientRect(descriptionElement);
     const activeBoundaries = this.#getBoundingClientRect(active);
     const elemBoundaries = this.#getBoundingClientRect(elem);
+    console.log(descBoundaries);
 
     const position = { x: 0, y: 0 };
     position.x = elemBoundaries.x + (elemBoundaries.width / 2) - (descBoundaries.width / 2);

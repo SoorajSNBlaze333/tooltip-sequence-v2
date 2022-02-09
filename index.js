@@ -209,8 +209,6 @@ class TooltipSequence {
       right: window.innerWidth - (activeBoundaries.x + activeBoundaries.width)
     }
 
-    console.log(constraints.left, descBoundaries.width);
-
     if (placement === 'top') {
       descriptionElement.style.width = "100%";
     } else if (placement === 'right' && constraints.right < descBoundaries.width) {
